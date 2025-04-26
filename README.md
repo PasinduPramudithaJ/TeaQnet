@@ -1,8 +1,8 @@
-# TeaVision: A Vision-Based Deep Learning Framework for Tea Quality Assessment
+# TeaQnet: A Vision-Based Deep Learning Framework for Tea Quality Assessment
 
 ## Project Overview
 
-**TeaVision** is an advanced deep learning-based framework designed to assess the quality of tea leaves by analyzing their color characteristics. By leveraging **convolutional neural networks (CNNs)**, **region-based CNN (RCNN)** models, and **colorimetric evaluation**, TeaVision provides expert-level grading of tea samples in a standardized environment.
+**TeaQnet** is an advanced deep learning-based framework designed to assess the quality of tea leaves by analyzing their color characteristics. By leveraging **convolutional neural networks (CNNs)**, **region-based CNN (RCNN)** models, and **colorimetric evaluation**, TeaVision provides expert-level grading of tea samples in a standardized environment.
 
 This research is aimed at improving the efficiency and objectivity of tea quality testing, making it easier for producers and quality assessors to maintain premium standards in the tea industry.
 

@@ -1,55 +1,47 @@
-# React + TypeScript + Vite
+# TeaVision: A Vision-Based Deep Learning Framework for Tea Quality Assessment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
 
-Currently, two official plugins are available:
+**TeaVision** is an advanced deep learning-based framework designed to assess the quality of tea leaves by analyzing their color characteristics. By leveraging **convolutional neural networks (CNNs)**, **region-based CNN (RCNN)** models, and **colorimetric evaluation**, TeaVision provides expert-level grading of tea samples in a standardized environment.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This research is aimed at improving the efficiency and objectivity of tea quality testing, making it easier for producers and quality assessors to maintain premium standards in the tea industry.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Research Problem
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Tea quality assessment traditionally relies on human experts who visually inspect tea samples. However, this process is subjective, time-consuming, and prone to inconsistencies. The goal of TeaVision is to automate the tea grading process using a computer vision-based approach that can evaluate tea based on color, ensuring objective and standardized assessments.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Features
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-"# TeaQnet" 
+- **Real-time Tea Quality Analysis:** TeaVision provides real-time results, giving users instant feedback on tea quality based on its color profile.
+- **Colorimetric Evaluation:** Uses advanced color-based features to assess tea quality, focusing on the chromatic characteristics of the leaves.
+- **Deep Learning-based Grading:** Powered by deep learning techniques, specifically RCNN, to identify key color and shape patterns indicative of tea quality.
+- **Expert-Level Accuracy:** TeaVision is trained on a wide variety of tea samples, ensuring high accuracy comparable to expert-level assessment.
+- **User-Friendly Interface:** The application provides a simple user interface for uploading tea leaf images and obtaining quality assessments.
+
+---
+
+## Technology Stack
+
+- **Programming Language:** Python
+- **Deep Learning Framework:** TensorFlow, Keras
+- **Model Architecture:** Region-based CNN (RCNN)
+- **Color Analysis:** OpenCV for image processing and colorimetric evaluation
+- **Frontend (Web Interface):** React.js, TypeScript, Bootstrap
+- **Backend:** Flask (optional, if applicable)
+- **Database:** SQLite or MongoDB (for storing tea samples and results)
+
+---
+
+## Installation
+
+To get started with the TeaVision project, follow the instructions below:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/TeaVision.git
+cd TeaVision

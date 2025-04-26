@@ -5,6 +5,7 @@ import image1 from '../../../assets/images/teaplant5.jpg';
 import image4 from '../../../assets/images/teaplant4.jpg';
 import image6 from '../../../assets/images/teaplant6.jpg';
 import image3 from '../../../assets/images/teaplant3.jpg';
+import Footer from './Footer';
 
 const Contend: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -25,13 +26,11 @@ const Contend: React.FC = () => {
       alert("Please upload a tea image first!");
       return;
     }
-    // Me place eke api call karanna puluwan
     console.log('Analyzing image:', selectedImage);
   };
 
   return (
     <>
-    
       <Header />
       <div className="bg-light min-vh-100 d-flex flex-column">
 
@@ -74,11 +73,11 @@ const Contend: React.FC = () => {
               <img
                 src={previewUrl}
                 alt="Preview"
-                className="img-thumbnail mt-3"
-                style={{ maxWidth: '300px' }}
+                className="img-thumbnail mt-3 img-fluid"
+                style={{ maxWidth: '100%' }}
               />
             )}
-            <div className="d-flex gap-3 mt-3">
+            <div className="d-flex gap-3 mt-3 flex-column flex-sm-row">
               <button type="submit" className="btn btn-outline-light btn-lg">Analyze Tea Sample</button>
               <button type="button" className="btn btn-light btn-lg text-success">Learn More</button>
             </div>
@@ -88,14 +87,14 @@ const Contend: React.FC = () => {
         {/* About Section */}
         <div className="container py-5">
           <div className="row align-items-center">
-            <div className="col-md-6 mb-4 mb-md-0">
+            <div className="col-12 col-md-6 mb-4 mb-md-0">
               <img
                 src={image4}
                 alt="Fresh Tea Leaves"
                 className="img-fluid rounded shadow"
               />
             </div>
-            <div className="col-md-6">
+            <div className="col-12 col-md-6">
               <h2 className="mb-4 text-success">About TeaVision</h2>
               <p className="lead text-muted">
                 TeaVision utilizes AI and deep learning models to assess tea quality based on liquor color profiles.
@@ -111,7 +110,7 @@ const Contend: React.FC = () => {
           <div className="container text-center">
             <h2 className="mb-5">How It Works</h2>
             <div className="row">
-              <div className="col-md-4 mb-4">
+              <div className="col-12 col-md-4 mb-4">
                 <div className="card h-100 shadow-sm border-0">
                   <img
                     src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80"
@@ -119,7 +118,7 @@ const Contend: React.FC = () => {
                     alt="Upload Tea Sample"
                     width={300}
                     height={400}
-                  style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover' }}
                   />
                   <div className="card-body">
                     <h5 className="card-title text-success">1. Upload</h5>
@@ -129,14 +128,14 @@ const Contend: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-4 mb-4">
+              <div className="col-12 col-md-4 mb-4">
                 <div className="card h-100 shadow-sm border-0">
                   <img
                     src={image6}
                     className="card-img-top"
                     alt="Analyze Tea"
                     width={300}
-                    height={400}    
+                    height={400}
                     style={{ objectFit: 'cover' }}
                   />
                   <div className="card-body">
@@ -147,7 +146,7 @@ const Contend: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-4 mb-4">
+              <div className="col-12 col-md-4 mb-4">
                 <div className="card h-100 shadow-sm border-0">
                   <img
                     src={image3}
@@ -168,18 +167,8 @@ const Contend: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="bg-dark text-white text-center py-4 mt-auto">
-          <div className="container">
-            <p className="mb-2">&copy; 2025 TeaVision. All Rights Reserved.</p>
-            <div className="d-flex justify-content-center gap-3">
-              <a href="/" className="text-white text-decoration-none">Home</a>
-              <a href="/about" className="text-white text-decoration-none">About</a>
-              <a href="/contact" className="text-white text-decoration-none">Contact</a>
-            </div>
-          </div>
-        </footer>
-
+        {/* Footer Component */}
+        <Footer />
       </div>
     </>
   );

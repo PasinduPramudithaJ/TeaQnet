@@ -73,6 +73,16 @@ const Header: React.FC = () => {
                 <b>Contact</b>
               </Link>
             </li>
+
+            <li className="nav-item">
+              <Link
+                className="nav-link text-white"
+                to="/login"
+                  // Scroll to bottom when clicked
+              >
+                <b>SignIn</b>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

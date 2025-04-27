@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import image1 from '../../../assets/images/teaplant5.jpg';
 import image4 from '../../../assets/images/teaplant4.jpg';
 import image6 from '../../../assets/images/teaplant6.jpg';
@@ -8,6 +9,17 @@ import image3 from '../../../assets/images/teaplant3.jpg';
 const Contend: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Update isMobile state based on window width
+  useEffect(() => {
+    const updateMobile = () => {
+      setIsMobile(window.innerWidth < 768); // adjust threshold as needed
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -18,10 +30,31 @@ const Contend: React.FC = () => {
     }
   };
 
+  const handleCaptureImage = async () => {
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+      });
+      if (photo.webPath) {
+        setPreviewUrl(photo.webPath);
+        const response = await fetch(photo.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], "captured_photo.jpg", { type: blob.type });
+        setSelectedImage(file);
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+      alert('Unable to access camera. Please check permissions.');
+    }
+  };
+
   const handleAnalyze = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedImage) {
-      alert("Please upload a tea image first!");
+      alert("Please upload or capture a tea image first!");
       return;
     }
     console.log('Analyzing image:', selectedImage);
@@ -30,14 +63,14 @@ const Contend: React.FC = () => {
   return (
     <>
       <div className="bg-light min-vh-100 d-flex flex-column">
-
         {/* Hero Section */}
-        <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center py-5" 
+        <div 
+          className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center py-5"
           style={{
             backgroundImage: `url(${image1})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            color: 'white'
+            color: 'white',
           }}
         >
           <motion.h1
@@ -66,6 +99,7 @@ const Contend: React.FC = () => {
               style={{ maxWidth: "300px" }}
               onChange={handleUpload}
             />
+
             {previewUrl && (
               <img
                 src={previewUrl}
@@ -74,9 +108,15 @@ const Contend: React.FC = () => {
                 style={{ maxWidth: '100%' }}
               />
             )}
+
             <div className="d-flex gap-3 mt-3 flex-column flex-sm-row">
               <button type="submit" className="btn btn-outline-light btn-lg">Analyze Tea Sample</button>
               <button type="button" className="btn btn-light btn-lg text-success">Learn More</button>
+              {isMobile && (
+                <button type="button" className="btn btn-warning btn-lg" onClick={handleCaptureImage}>
+                  📷 Capture Photo
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -107,62 +147,44 @@ const Contend: React.FC = () => {
           <div className="container text-center">
             <h2 className="mb-5">How It Works</h2>
             <div className="row">
-              <div className="col-12 col-md-4 mb-4">
-                <div className="card h-100 shadow-sm border-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80"
-                    className="card-img-top"
-                    alt="Upload Tea Sample"
-                    width={300}
-                    height={400}
-                    style={{ objectFit: 'cover' }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title text-success">1. Upload</h5>
-                    <p className="card-text text-muted">
-                      Upload a high-quality tea liquor image through our secure platform.
-                    </p>
+              {[
+                {
+                  img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80",
+                  title: "1. Upload",
+                  desc: "Upload a high-quality tea liquor image through our secure platform."
+                },
+                {
+                  img: image6,
+                  title: "2. Analyze",
+                  desc: "Our AI analyzes color gradients and unique features for precise grading."
+                },
+                {
+                  img: image3,
+                  title: "3. Get Results",
+                  desc: "Instantly receive an expert-level tea quality report and insights."
+                }
+              ].map((step, index) => (
+                <div key={index} className="col-12 col-md-4 mb-4">
+                  <div className="card h-100 shadow-sm border-0">
+                    <img
+                      src={step.img}
+                      alt={step.title}
+                      width={300}
+                      height={400}
+                      className="card-img-top"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <div className="card-body">
+                      <h5 className="card-title text-success">{step.title}</h5>
+                      <p className="card-text text-muted">{step.desc}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-12 col-md-4 mb-4">
-                <div className="card h-100 shadow-sm border-0">
-                  <img
-                    src={image6}
-                    className="card-img-top"
-                    alt="Analyze Tea"
-                    width={300}
-                    height={400}
-                    style={{ objectFit: 'cover' }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title text-success">2. Analyze</h5>
-                    <p className="card-text text-muted">
-                      Our AI analyzes color gradients and unique features for precise grading.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 col-md-4 mb-4">
-                <div className="card h-100 shadow-sm border-0">
-                  <img
-                    src={image3}
-                    alt="Get Results"
-                    width={300}
-                    height={400}
-                    className="card-img-top"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title text-success">3. Get Results</h5>
-                    <p className="card-text text-muted">
-                      Instantly receive an expert-level tea quality report and insights.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
+
       </div>
     </>
   );

@@ -2,6 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
   return (
     <footer className="text-white text-center py-4 mt-auto"  style={{ backgroundColor: '#1E5F16' }}>
       <div className="container">
@@ -40,14 +46,14 @@ const Footer: React.FC = () => {
                 </h6>
                 <p><Link to="#" className="text-white text-decoration-none">Research Paper</Link></p>
                 <p><Link to="#" className="text-white text-decoration-none">Publications</Link></p>
-                <p><Link to="#" className="text-white text-decoration-none">Team</Link></p>
+                <p><Link to="#" className="text-white text-decoration-none" onClick={scrollToTop}>Home</Link></p>
                 <p><Link to="#" className="text-white text-decoration-none">Contact Us</Link></p>
               </div>
 
               <hr className="w-100 clearfix d-md-none" />
 
               {/* Contact */}
-              <div className="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+              <div id='contact' className="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
                 <h6 className="text-uppercase mb-4 font-weight-bold">Contact</h6>
                 <p><i className="fas fa-home mr-3"></i> University of Kelaniya, Sri Lanka</p>
                 <p><i className="fas fa-envelope mr-3"></i> teavision.research@gmail.com</p>

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Header from './Header';
 import image1 from '../../../assets/images/teaplant5.jpg';
 import image4 from '../../../assets/images/teaplant4.jpg';
 import image6 from '../../../assets/images/teaplant6.jpg';
 import image3 from '../../../assets/images/teaplant3.jpg';
-import Footer from './Footer';
 
 const Contend: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -31,7 +29,6 @@ const Contend: React.FC = () => {
 
   return (
     <>
-      <Header />
       <div className="bg-light min-vh-100 d-flex flex-column">
 
         {/* Hero Section */}
@@ -166,9 +163,6 @@ const Contend: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Footer Component */}
-        <Footer />
       </div>
     </>
   );

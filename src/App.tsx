@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
-import Contend from "./assets/components/layout/Contend";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Home from "./assets/components/layout/Home";
 
 
 
@@ -10,7 +10,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Contend />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </Router>
   )

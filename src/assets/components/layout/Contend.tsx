@@ -1,70 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { useNavigate } from "react-router-dom";
 import image1 from "../../../assets/images/teaplant5.jpg";
 import image4 from "../../../assets/images/teaplant4.jpg";
 import image6 from "../../../assets/images/teaplant6.jpg";
 import image3 from "../../../assets/images/teaplant3.jpg";
 
 const Contend: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  // Update isMobile state based on window width
-  useEffect(() => {
-    const updateMobile = () => {
-      setIsMobile(window.innerWidth < 768); // adjust threshold as needed
-    };
-    updateMobile();
-    window.addEventListener("resize", updateMobile);
-    return () => window.removeEventListener("resize", updateMobile);
-  }, []);
-
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
-  };
-
-  const handleCaptureImage = async () => {
-    try {
-      const photo = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
-      });
-      if (photo.webPath) {
-        setPreviewUrl(photo.webPath);
-        const response = await fetch(photo.webPath);
-        const blob = await response.blob();
-        const file = new File([blob], "captured_photo.jpg", {
-          type: blob.type,
-        });
-        setSelectedImage(file);
-      }
-    } catch (error) {
-      console.error("Camera error:", error);
-      alert("Unable to access camera. Please check permissions.");
-    }
-  };
-
-  const handleAnalyze = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!selectedImage) {
-      alert("Please upload or capture a tea image first!");
-      return;
-    }
-    console.log("Analyzing image:", selectedImage);
-  };
-
-  const handleClearImage = () => {
-    setSelectedImage(null);
-    setPreviewUrl(null);
+  const handleGetStarted = () => {
+    navigate('/login'); // Navigate to the dashboard for image upload and capture functionality
   };
 
   return (
@@ -97,61 +43,13 @@ const Contend: React.FC = () => {
             Revolutionizing Tea Quality Assessment through Deep Learning
           </motion.p>
 
-          {/* Upload Form */}
-          <form
-            onSubmit={handleAnalyze}
-            className="d-flex flex-column align-items-center"
-            style={{ gap: "1rem" }}
+          {/* Get Started Button */}
+          <button
+            onClick={handleGetStarted}
+            className="btn btn-warning btn-lg"
           >
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control"
-              style={{ maxWidth: "300px" }}
-              onChange={handleUpload}
-            />
-
-            {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="img-thumbnail mt-3 img-fluid"
-                style={{ maxWidth: "100%" }}
-              />
-            )}
-
-{isMobile && (
-                <button
-                  type="button"
-                  className="btn btn-warning btn-lg"
-                  onClick={handleCaptureImage}
-                >
-                  📷 Capture Photo
-                </button>
-              )}
-              {previewUrl && (
-                <button
-                  type="button"
-                  className="btn btn-danger btn-lg"
-                  onClick={handleClearImage}
-                >
-                  🗑️ Clear Image
-                </button>
-              )}
-
-            <div className="d-flex gap-3 mt-3 flex-column flex-sm-row">
-              <button type="submit" className="btn btn-outline-light btn-lg">
-                Analyze Tea Sample
-              </button>
-              <button
-                type="button"
-                className="btn btn-light btn-lg text-success"
-              >
-                Learn More
-              </button>
-             
-            </div>
-          </form>
+            Get Started
+          </button>
         </div>
 
         {/* About Section */}
@@ -182,7 +80,7 @@ const Contend: React.FC = () => {
           <div className="container text-center">
             <h2 className="mb-5">How It Works</h2>
             <div className="row">
-              {[
+              {[ 
                 {
                   img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80",
                   title: "1. Upload",

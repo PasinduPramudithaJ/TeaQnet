@@ -35,3 +35,11 @@
 .read-the-docs {
   color: #888;
 }
+.preview-image {
+  width: 100%;
+  max-width: 700px;   /* desktop max size */
+  height: auto;
+  display: block;
+  margin: 1rem auto;  /* centers it */
+  border-radius: 12px; /* optional smooth corners */
+}

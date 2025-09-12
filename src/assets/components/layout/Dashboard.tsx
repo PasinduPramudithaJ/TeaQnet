@@ -113,6 +113,8 @@ const Dashboard: React.FC = () => {
     const urls = [
       "http://localhost:5000/predict",
       "http://10.215.59.186:5000/predict",
+      "http://10.5.84.98:5000/predict",
+
     ];
 
     let data: PredictionResponse | null = null;

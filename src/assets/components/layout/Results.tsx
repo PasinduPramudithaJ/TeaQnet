@@ -11,6 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import image1 from "../../images/background2.jpg"; // same background as Dashboard
+import Header from "./Header";
+import Footer from "./Footer";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -83,7 +85,7 @@ const Results: React.FC = () => {
   }
 
   return (
-    <div
+      <><Header /><div
       className="container-fluid d-flex flex-column align-items-center justify-content-center min-vh-100"
       style={{
         backgroundImage: `url(${image1})`,
@@ -110,8 +112,7 @@ const Results: React.FC = () => {
               src={croppedImage}
               alt="Cropped"
               className="img-fluid rounded shadow mb-3"
-              style={{ maxHeight: "350px", objectFit: "cover" }}
-            />
+              style={{ maxHeight: "350px", objectFit: "cover" }} />
           </div>
         )}
 
@@ -152,11 +153,9 @@ const Results: React.FC = () => {
         <div className="text-center mt-4">
           <button
             className="btn btn-secondary me-2"
-            onClick={() =>
-              navigate("/dashboard", {
-                state: { croppedImage, prediction, confidence, probabilities, info },
-              })
-            }
+            onClick={() => navigate("/dashboard", {
+              state: { croppedImage, prediction, confidence, probabilities, info },
+            })}
           >
             ⬅️ Back
           </button>
@@ -169,6 +168,7 @@ const Results: React.FC = () => {
         </div>
       </div>
     </div>
+    <Footer /></>
   );
 };
 

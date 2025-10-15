@@ -22,7 +22,7 @@ const Dashboard: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("http://10.100.128.186:5000");
+  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
   const [lastPrediction, setLastPrediction] = useState<PredictionResponse | null>(null);
 
   const navigate = useNavigate();
@@ -185,6 +185,20 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
+         <div className="mt-4">
+            <button
+              className="btn btn-primary text-white me-2"
+              onClick={() => (window.location.href = "/multi")}
+            >
+               🔮Multiple Predictions
+            </button>
+            <button
+              className="btn btn-dark"
+              onClick={() => (window.location.href = "/")}
+            >
+              🏠 Home
+            </button>
+          </div>
       </div>
       <Footer />
     </>

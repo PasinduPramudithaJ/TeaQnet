@@ -7,6 +7,7 @@ import Register from "./assets/components/User/Register";
 import Dashboard from "./assets/components/layout/Dashboard";
 import Settings from "./assets/components/layout/settings";
 import Results from "./assets/components/layout/Results";
+import Multipredict from "./assets/components/layout/Multipredict";
 
 
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard/>} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/results" element={<Results />} />
+        <Route path="/multi" element={<Multipredict />} />
       </Routes>
     </Router>
   )

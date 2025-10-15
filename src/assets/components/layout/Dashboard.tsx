@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <Header />
+       <Header></Header>
       <div
         className="flex-grow-1 d-flex flex-column align-items-center justify-content-start text-center py-5"
         style={{
@@ -134,10 +134,10 @@ const Dashboard: React.FC = () => {
         <button
           onClick={handleLogout}
           className="btn btn-danger position-absolute"
-          style={{ top: 20, right: 20 }}
+          style={{ top: 8, right: 8 }}
           title="Logout"
         >
-          <FiLogOut size={24} />
+          <FiLogOut size={12} />
         </button>
 
         <h2 className="text-center mb-4">Tea Region Dashboard</h2>

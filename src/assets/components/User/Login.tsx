@@ -1,18 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
-import backgroundImage from '../../images/background2.jpg'; // Adjust the path as necessary
+import backgroundImage from '../../images/background2.jpg';
 
-const Login = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Redirect to dashboard if already signed in
+    const isSignedIn = localStorage.getItem('isSignedIn') === 'true';
+    if (isSignedIn) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+
     if (storedUser.email === email && storedUser.password === password) {
+      // Mark as signed in
+      localStorage.setItem('isSignedIn', 'true');
       alert('Login Successful!');
       navigate('/dashboard');
     } else {
@@ -29,8 +40,8 @@ const Login = () => {
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed', 
-          minHeight: '80vh',// Keeps the background fixed during scroll
+          backgroundAttachment: 'fixed',
+          minHeight: '80vh',
         }}
       >
         <div
@@ -39,7 +50,7 @@ const Login = () => {
             width: '100%',
             maxWidth: '400px',
             borderRadius: '1rem',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slight transparency to make it readable
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
           }}
         >
           <h2 className="text-center mb-4 text-primary">Login</h2>
@@ -76,7 +87,7 @@ const Login = () => {
             <small className="text-muted">
               Don't have an account?{' '}
               <Link className="text-success text-decoration-none" to="/register">
-                &nbsp;Register now!
+                Register now!
               </Link>
             </small>
           </div>

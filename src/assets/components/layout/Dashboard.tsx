@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
+import { FiLogOut } from "react-icons/fi"; // 🔑 Import logout icon
 
 interface PredictionResponse {
   prediction?: string;
@@ -28,12 +29,18 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Check signed-in status
+  useEffect(() => {
+    const isSignedIn = localStorage.getItem("isSignedIn") === "true";
+    if (!isSignedIn) {
+      navigate("/login"); // Redirect if not signed in
+    }
+  }, [navigate]);
+
   // Restore backend URL from localStorage
   useEffect(() => {
     const savedUrl = localStorage.getItem("backend_url");
-    if (savedUrl) {
-      setApiUrl(savedUrl);
-    }
+    if (savedUrl) setApiUrl(savedUrl);
   }, []);
 
   // Restore state from Results if user comes back
@@ -41,9 +48,7 @@ const Dashboard: React.FC = () => {
     if (location.state) {
       const stateData = location.state as PredictionResponse;
       setLastPrediction(stateData);
-      if (stateData.croppedImage) {
-        setPreviewUrl(stateData.croppedImage);
-      }
+      if (stateData.croppedImage) setPreviewUrl(stateData.croppedImage);
     }
   }, [location.state]);
 
@@ -52,7 +57,7 @@ const Dashboard: React.FC = () => {
     if (file) {
       setSelectedImage(file);
       setPreviewUrl(URL.createObjectURL(file));
-      setLastPrediction(null); // reset old prediction
+      setLastPrediction(null);
     }
   };
 
@@ -71,7 +76,7 @@ const Dashboard: React.FC = () => {
         const blob = await response.blob();
         const file = new File([blob], "captured_photo.jpg", { type: blob.type });
         setSelectedImage(file);
-        setLastPrediction(null); // reset old prediction
+        setLastPrediction(null);
       }
     } catch (error) {
       console.error("Camera error:", error);
@@ -86,25 +91,17 @@ const Dashboard: React.FC = () => {
     }
 
     setIsLoading(true);
-
     const formData = new FormData();
     formData.append("file", selectedImage);
 
     try {
-      const response = await fetch(`${apiUrl}/predict`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(`${apiUrl}/predict`, { method: "POST", body: formData });
       const data: PredictionResponse = await response.json();
-
       if (data.error) throw new Error(data.error);
-
-      // Navigate to Results page with prediction data
       navigate("/results", { state: data });
     } catch (err: any) {
       alert("Prediction failed: " + err.message);
     }
-
     setIsLoading(false);
   };
 
@@ -114,23 +111,40 @@ const Dashboard: React.FC = () => {
     setLastPrediction(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("isSignedIn");
+    navigate("/");
+  };
+
   return (
     <>
       <Header />
       <div
-        className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center py-5"
+        className="flex-grow-1 d-flex flex-column align-items-center justify-content-start text-center py-5"
         style={{
           backgroundImage: `url(${image1})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           color: "white",
-          minHeight: "60vh",
+          minHeight: "80vh",
+          position: "relative",
         }}
       >
+        {/* 🔝 Logout button at top-right corner */}
+        <button
+          onClick={handleLogout}
+          className="btn btn-danger position-absolute"
+          style={{ top: 20, right: 20 }}
+          title="Logout"
+        >
+          <FiLogOut size={24} />
+        </button>
+
         <h2 className="text-center mb-4">Tea Region Dashboard</h2>
         <p>
           <strong>Backend:</strong> {apiUrl}
         </p>
+
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-5">
@@ -154,11 +168,7 @@ const Dashboard: React.FC = () => {
             {previewUrl && (
               <div className="col-md-5">
                 <div className="card shadow-sm p-3 text-center">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="img-fluid rounded mb-3"
-                  />
+                  <img src={previewUrl} alt="Preview" className="img-fluid rounded mb-3" />
                   <button
                     className="btn btn-primary mb-2"
                     onClick={handlePredict}
@@ -166,10 +176,7 @@ const Dashboard: React.FC = () => {
                   >
                     {isLoading ? "Predicting..." : "🔮 Predict Region"}
                   </button>
-                  <button
-                    className="btn btn-danger mt-2"
-                    onClick={handleClearImage}
-                  >
+                  <button className="btn btn-danger mt-2" onClick={handleClearImage}>
                     🗑️ Clear Image
                   </button>
 
@@ -185,20 +192,18 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
-         <div className="mt-4">
-            <button
-              className="btn btn-primary text-white me-2"
-              onClick={() => (window.location.href = "/multi")}
-            >
-               🔮Multiple Predictions
-            </button>
-            <button
-              className="btn btn-dark"
-              onClick={() => (window.location.href = "/")}
-            >
-              🏠 Home
-            </button>
-          </div>
+
+        <div className="mt-4">
+          <button
+            className="btn btn-primary text-white me-2"
+            onClick={() => navigate("/multi")}
+          >
+            🔮 Multiple Predictions
+          </button>
+          <button className="btn btn-dark" onClick={() => navigate("/")}>
+            🏠 Home
+          </button>
+        </div>
       </div>
       <Footer />
     </>

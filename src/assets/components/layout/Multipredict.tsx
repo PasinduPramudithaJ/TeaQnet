@@ -36,7 +36,7 @@ const MultiPredict: React.FC = () => {
     if (savedUrl) setApiUrl(savedUrl);
   }, []);
 
-  // ✅ Allow unlimited uploads (append + prevent duplicates)
+  // ✅ Handle file uploads
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -57,7 +57,7 @@ const MultiPredict: React.FC = () => {
     e.target.value = "";
   };
 
-  // 🔮 Predict all images
+  // 🔮 Predict all images simultaneously
   const handlePredictAll = async () => {
     if (images.length === 0) {
       alert("Please upload at least one image.");
@@ -65,29 +65,29 @@ const MultiPredict: React.FC = () => {
     }
 
     setIsLoading(true);
-    const updatedResults: ImagePrediction[] = [];
 
-    for (const img of images) {
-      const formData = new FormData();
-      formData.append("file", img.file);
+    try {
+      const promises = images.map(async (img) => {
+        const formData = new FormData();
+        formData.append("file", img.file);
 
-      try {
-        const response = await fetch(`${apiUrl}/predict`, {
-          method: "POST",
-          body: formData,
-        });
-        const data: PredictionResponse = await response.json();
-        updatedResults.push({ ...img, result: data });
-      } catch (error) {
-        updatedResults.push({
-          ...img,
-          result: { error: "Prediction failed" },
-        });
-      }
+        try {
+          const response = await fetch(`${apiUrl}/predict`, {
+            method: "POST",
+            body: formData,
+          });
+          const data: PredictionResponse = await response.json();
+          return { ...img, result: data };
+        } catch (error) {
+          return { ...img, result: { error: "Prediction failed" } };
+        }
+      });
+
+      const updatedResults = await Promise.all(promises);
+      setImages(updatedResults);
+    } finally {
+      setIsLoading(false);
     }
-
-    setImages(updatedResults);
-    setIsLoading(false);
   };
 
   const handleClear = () => setImages([]);
@@ -292,21 +292,22 @@ const MultiPredict: React.FC = () => {
             </div>
           </div>
         )}
-         {/* 🔙 Navigation Buttons */}
-          <div className="mt-4">
-            <button
-              className="btn btn-secondary me-2"
-              onClick={() => (window.location.href = "/dashboard")}
-            >
-              🔙 Back to Dashboard
-            </button>
-            <button
-              className="btn btn-dark"
-              onClick={() => (window.location.href = "/")}
-            >
-              🏠 Home
-            </button>
-          </div>
+
+        {/* 🔙 Navigation Buttons */}
+        <div className="mt-4">
+          <button
+            className="btn btn-secondary me-2"
+            onClick={() => (window.location.href = "/dashboard")}
+          >
+            🔙 Back to Dashboard
+          </button>
+          <button
+            className="btn btn-dark"
+            onClick={() => (window.location.href = "/")}
+          >
+            🏠 Home
+          </button>
+        </div>
       </div>
       <Footer />
     </>

@@ -9,6 +9,7 @@ import Settings from "./assets/components/layout/settings";
 import Results from "./assets/components/layout/Results";
 import Multipredict from "./assets/components/layout/Multipredict";
 import { JSX } from "react";
+import ModelComparison from "./assets/components/layout/ModelComparison";
 
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
@@ -55,6 +56,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Multipredict />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/comparison" 
+          element={
+            <ProtectedRoute>
+              <ModelComparison />
             </ProtectedRoute>
           } 
         />

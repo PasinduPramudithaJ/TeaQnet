@@ -25,6 +25,7 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
   const [lastPrediction, setLastPrediction] = useState<PredictionResponse | null>(null);
+  const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW: Image type selection
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,9 +33,7 @@ const Dashboard: React.FC = () => {
   // Check signed-in status
   useEffect(() => {
     const isSignedIn = localStorage.getItem("isSignedIn") === "true";
-    if (!isSignedIn) {
-      navigate("/login"); // Redirect if not signed in
-    }
+    if (!isSignedIn) navigate("/login");
   }, [navigate]);
 
   // Restore backend URL from localStorage
@@ -95,7 +94,10 @@ const Dashboard: React.FC = () => {
     formData.append("file", selectedImage);
 
     try {
-      const response = await fetch(`${apiUrl}/predict`, { method: "POST", body: formData });
+      const response = await fetch(`${apiUrl}/predict?type=${selectedImageType}`, {
+        method: "POST",
+        body: formData,
+      });
       const data: PredictionResponse = await response.json();
       if (data.error) throw new Error(data.error);
       navigate("/results", { state: data });
@@ -118,7 +120,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-       <Header></Header>
+      <Header />
       <div
         className="flex-grow-1 d-flex flex-column align-items-center justify-content-start text-center py-5"
         style={{
@@ -130,14 +132,14 @@ const Dashboard: React.FC = () => {
           position: "relative",
         }}
       >
-        {/* 🔝 Logout button at top-right corner */}
+        {/* 🔝 Logout button */}
         <button
           onClick={handleLogout}
           className="btn btn-danger position-absolute"
           style={{ top: 8, right: 8 }}
           title="Logout"
         >
-          <FiLogOut size={12} />
+          <FiLogOut size={16} />
         </button>
 
         <h2 className="text-center mb-4">Tea Region Dashboard</h2>
@@ -149,6 +151,31 @@ const Dashboard: React.FC = () => {
           <div className="row justify-content-center">
             <div className="col-md-5">
               <div className="card shadow-sm p-3 mb-4 text-center">
+                <h5>Select Image Type</h5>
+                <div className="dropdown mb-3">
+                  <button
+                    className="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="imageTypeDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Cropped)"}
+                  </button>
+                  <ul className="dropdown-menu" aria-labelledby="imageTypeDropdown">
+                    <li>
+                      <button className="dropdown-item" type="button" onClick={() => setSelectedImageType("raw")}>
+                        Raw Image (Auto Crop)
+                      </button>
+                    </li>
+                    <li>
+                      <button className="dropdown-item" type="button" onClick={() => setSelectedImageType("preprocessed")}>
+                        Preprocessed (Already Cropped)
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+
                 <h5>Upload or Capture Tea Image</h5>
                 <input
                   type="file"
@@ -156,10 +183,7 @@ const Dashboard: React.FC = () => {
                   onChange={handleUpload}
                   className="form-control mt-2"
                 />
-                <button
-                  className="btn btn-warning mt-2"
-                  onClick={handleCaptureImage}
-                >
+                <button className="btn btn-warning mt-2" onClick={handleCaptureImage}>
                   📷 Capture Photo
                 </button>
               </div>
@@ -194,10 +218,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="mt-4">
-          <button
-            className="btn btn-primary text-white me-2"
-            onClick={() => navigate("/multi")}
-          >
+          <button className="btn btn-primary text-white me-2" onClick={() => navigate("/multi")}>
             🔮 Multiple Predictions
           </button>
           <button className="btn btn-dark" onClick={() => navigate("/")}>

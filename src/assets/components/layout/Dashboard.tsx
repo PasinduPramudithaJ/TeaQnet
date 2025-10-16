@@ -23,7 +23,7 @@ const Dashboard: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("https://tea-region-backend.onrender.com");
+  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
   const [lastPrediction, setLastPrediction] = useState<PredictionResponse | null>(null);
 
   const navigate = useNavigate();

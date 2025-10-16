@@ -41,7 +41,9 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"
 const MultiPredict: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("https://tea-region-backend.onrender.com");
+  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
+  const [selectedModel, setSelectedModel] = useState<string>("tea_4_region_model_restnet18");
+  const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW state for image type
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,11 +84,16 @@ const MultiPredict: React.FC = () => {
       const promises = images.map(async (img) => {
         const formData = new FormData();
         formData.append("file", img.file);
+
         try {
-          const response = await fetch(`${apiUrl}/predict`, {
-            method: "POST",
-            body: formData,
-          });
+          // Include both model and image type in the API call
+          const response = await fetch(
+            `${apiUrl}/predict?model=${selectedModel}&type=${selectedImageType}`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
           const data: PredictionResponse = await response.json();
           return { ...img, result: data };
         } catch (error) {
@@ -112,7 +119,7 @@ const MultiPredict: React.FC = () => {
     const width = pdf.internal.pageSize.getWidth();
     const height = (canvas.height * width) / canvas.width;
     pdf.addImage(imgData, "PNG", 0, 0, width, height);
-    pdf.save("tea_region_predictions.pdf");
+    pdf.save("tea_predictions.pdf");
   };
 
   // Download as PNG
@@ -120,7 +127,7 @@ const MultiPredict: React.FC = () => {
     if (!tableRef.current) return;
     const canvas = await html2canvas(tableRef.current, { scale: 2 });
     const link = document.createElement("a");
-    link.download = "tea_region_predictions.png";
+    link.download = "tea_predictions.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
@@ -143,11 +150,11 @@ const MultiPredict: React.FC = () => {
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "tea_region_predictions.csv";
+    link.download = "tea_predictions.csv";
     link.click();
   };
 
-  // === Chart Data Generation ===
+  // Charts
   const validResults = images.filter((img) => img.result?.prediction && !img.result?.error);
   const predictionCounts: Record<string, number> = {};
   const confidenceSums: Record<string, number> = {};
@@ -181,14 +188,81 @@ const MultiPredict: React.FC = () => {
           minHeight: "85vh",
         }}
       >
-        <h2 className="mb-4">Multiple Tea Region Prediction</h2>
-        <p>
-          <strong>Backend:</strong> {apiUrl}
-        </p>
+        <h2 className="mb-4">Multiple Tea Prediction</h2>
+        <p><strong>Backend:</strong> {apiUrl}</p>
 
+        {/* Model and Image Type selection */}
         <div className="card p-4 bg-light text-dark shadow-sm mb-4" style={{ width: "80%", maxWidth: "900px" }}>
+          <h5>Select Model</h5>
+          <div className="dropdown mb-3">
+            <button
+              className="btn btn-primary dropdown-toggle"
+              type="button"
+              id="modelDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {selectedModel === "tea_4_region_model_restnet18" ? "ResNet 18" : "ResNet 4"}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="modelDropdown">
+              <li>
+                <button
+                  className="dropdown-item"
+                  type="button"
+                  onClick={() => setSelectedModel("tea_4_region_model_restnet18")}
+                >
+                  ResNet 18
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  type="button"
+                  onClick={() => setSelectedModel("tea_4_region_model_restnet4")}
+                >
+                  ResNet 4
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* NEW: Image Type Dropdown */}
+          <h5>Select Image Type</h5>
+          <div className="dropdown mb-3">
+            <button
+              className="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="imageTypeDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Cropped)"}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="imageTypeDropdown">
+              <li>
+                <button
+                  className="dropdown-item"
+                  type="button"
+                  onClick={() => setSelectedImageType("raw")}
+                >
+                  Raw Image (Auto Crop)
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  type="button"
+                  onClick={() => setSelectedImageType("preprocessed")}
+                >
+                  Preprocessed (Already Cropped)
+                </button>
+              </li>
+            </ul>
+          </div>
+
           <h5>Upload Multiple Tea Images</h5>
           <input type="file" accept="image/*" multiple onChange={handleUpload} className="form-control mt-2" />
+
           <div className="mt-3 d-flex justify-content-center flex-wrap">
             <button className="btn btn-primary me-2 mb-2" onClick={handlePredictAll} disabled={isLoading}>
               {isLoading ? "Predicting..." : "🔮 Predict All"}
@@ -209,33 +283,20 @@ const MultiPredict: React.FC = () => {
                   ⬇️ Download Results
                 </button>
                 <ul className="dropdown-menu" aria-labelledby="downloadDropdown">
-                  <li>
-                    <button className="dropdown-item" onClick={handleDownloadImage}>
-                      🖼️ Download as Image (PNG)
-                    </button>
-                  </li>
-                  <li>
-                    <button className="dropdown-item" onClick={handleDownloadPDF}>
-                      📄 Download as PDF
-                    </button>
-                  </li>
-                  <li>
-                    <button className="dropdown-item" onClick={handleDownloadCSV}>
-                      📊 Download as CSV
-                    </button>
-                  </li>
+                  <li><button className="dropdown-item" onClick={handleDownloadImage}>🖼️ PNG</button></li>
+                  <li><button className="dropdown-item" onClick={handleDownloadPDF}>📄 PDF</button></li>
+                  <li><button className="dropdown-item" onClick={handleDownloadCSV}>📊 CSV</button></li>
                 </ul>
               </div>
             )}
           </div>
         </div>
 
-        {/* === Charts Section === */}
+        {/* Charts */}
         {validResults.length > 0 && (
           <div className="container mt-4">
             <h4 className="text-white mb-3">📊 Prediction Summary</h4>
             <div className="row">
-              {/* Pie Chart */}
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
                   <h6>🥧 Prediction Distribution</h6>
@@ -253,10 +314,9 @@ const MultiPredict: React.FC = () => {
                 </div>
               </div>
 
-              {/* Bar Chart */}
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
-                  <h6>📈 Average Confidence per Region</h6>
+                  <h6>📈 Avg Confidence per Region</h6>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={barData}>
                       <XAxis dataKey="name" />
@@ -272,7 +332,7 @@ const MultiPredict: React.FC = () => {
           </div>
         )}
 
-        {/* Table Section */}
+        {/* Table */}
         {images.length > 0 && (
           <div className="container mt-4 bg-white text-dark p-3 rounded shadow" ref={tableRef}>
             <div className="table-responsive">
@@ -297,34 +357,14 @@ const MultiPredict: React.FC = () => {
                           alt={`preview-${i}`}
                           width="80"
                           height="80"
-                          style={{
-                            objectFit: "cover",
-                            borderRadius: "6px",
-                            border: "1px solid #ccc",
-                          }}
+                          style={{ objectFit: "cover", borderRadius: "6px", border: "1px solid #ccc" }}
                         />
                       </td>
                       <td>{img.file.name}</td>
+                      <td>{img.result?.prediction || "—"}</td>
+                      <td>{img.result?.confidence ? (img.result.confidence * 100).toFixed(2) + "%" : "—"}</td>
                       <td>
-                        {img.result?.prediction ? (
-                          <span className="fw-bold text-success">{img.result.prediction}</span>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                      <td>
-                        {img.result?.confidence
-                          ? (img.result.confidence * 100).toFixed(2) + "%"
-                          : "—"}
-                      </td>
-                      <td>
-                        {img.result?.error ? (
-                          <span className="text-danger fw-bold">❌ Failed</span>
-                        ) : img.result ? (
-                          <span className="text-success fw-bold">✅ Done</span>
-                        ) : (
-                          <span className="text-warning">⏳ Waiting</span>
-                        )}
+                        {img.result?.error ? "❌ Failed" : img.result ? "✅ Done" : "⏳ Waiting"}
                       </td>
                     </tr>
                   ))}
@@ -334,14 +374,9 @@ const MultiPredict: React.FC = () => {
           </div>
         )}
 
-        {/* 🔙 Navigation */}
         <div className="mt-4">
-          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>
-            🔙 Back to Dashboard
-          </button>
-          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>
-            🏠 Home
-          </button>
+          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>🔙 Dashboard</button>
+          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>🏠 Home</button>
         </div>
       </div>
       <Footer />

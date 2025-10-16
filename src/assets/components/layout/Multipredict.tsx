@@ -41,7 +41,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"
 const MultiPredict: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
+  const [apiUrl, setApiUrl] = useState<string>("https://tea-region-backend.onrender.com");
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
-import { FiLogOut } from "react-icons/fi"; // 🔑 Import logout icon
+import { FiLogOut, FiCamera, FiRefreshCw, FiGrid } from "react-icons/fi";
 
 interface PredictionResponse {
   prediction?: string;
@@ -23,26 +23,23 @@ const Dashboard: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
+  const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const [lastPrediction, setLastPrediction] = useState<PredictionResponse | null>(null);
-  const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW: Image type selection
+  const [selectedImageType, setSelectedImageType] = useState<string>("raw");
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check signed-in status
   useEffect(() => {
     const isSignedIn = localStorage.getItem("isSignedIn") === "true";
     if (!isSignedIn) navigate("/login");
   }, [navigate]);
 
-  // Restore backend URL from localStorage
   useEffect(() => {
     const savedUrl = localStorage.getItem("backend_url");
     if (savedUrl) setApiUrl(savedUrl);
   }, []);
 
-  // Restore state from Results if user comes back
   useEffect(() => {
     if (location.state) {
       const stateData = location.state as PredictionResponse;
@@ -84,10 +81,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handlePredict = async () => {
-    if (!selectedImage) {
-      alert("Please upload or capture an image first.");
-      return;
-    }
+    if (!selectedImage) return alert("Please upload or capture an image first.");
 
     setIsLoading(true);
     const formData = new FormData();
@@ -122,39 +116,38 @@ const Dashboard: React.FC = () => {
     <>
       <Header />
       <div
-        className="flex-grow-1 d-flex flex-column align-items-center justify-content-start text-center py-5"
+        className="flex-grow-1 d-flex flex-column align-items-center justify-content-start py-5"
         style={{
           backgroundImage: `url(${image1})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          color: "white",
-          minHeight: "80vh",
+          minHeight: "85vh",
           position: "relative",
+          color: "#fff",
         }}
       >
-        {/* 🔝 Logout button */}
+        {/* Logout */}
         <button
           onClick={handleLogout}
           className="btn btn-danger position-absolute"
-          style={{ top: 8, right: 8 }}
+          style={{ top: 12, right: 12 }}
           title="Logout"
         >
-          <FiLogOut size={16} />
+          <FiLogOut size={18} />
         </button>
 
-        <h2 className="text-center mb-4">Tea Region Dashboard</h2>
-        <p>
-          <strong>Backend:</strong> {apiUrl}
-        </p>
+        <h2 className="text-center mb-4 text-shadow">🍵 Tea Region Dashboard</h2>
+        <p className="text-light text-shadow"><strong>Backend:</strong> {apiUrl}</p>
 
         <div className="container">
-          <div className="row justify-content-center">
+          <div className="row justify-content-center gy-4">
+            {/* Image selection card */}
             <div className="col-md-5">
-              <div className="card shadow-sm p-3 mb-4 text-center">
-                <h5>Select Image Type</h5>
+              <div className="card shadow-lg p-4 bg-light text-dark text-center">
+                <h5 className="mb-3">Select Image Type</h5>
                 <div className="dropdown mb-3">
                   <button
-                    className="btn btn-secondary dropdown-toggle"
+                    className="btn btn-secondary dropdown-toggle w-100"
                     type="button"
                     id="imageTypeDropdown"
                     data-bs-toggle="dropdown"
@@ -162,14 +155,14 @@ const Dashboard: React.FC = () => {
                   >
                     {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Cropped)"}
                   </button>
-                  <ul className="dropdown-menu" aria-labelledby="imageTypeDropdown">
+                  <ul className="dropdown-menu w-100" aria-labelledby="imageTypeDropdown">
                     <li>
-                      <button className="dropdown-item" type="button" onClick={() => setSelectedImageType("raw")}>
+                      <button className="dropdown-item" onClick={() => setSelectedImageType("raw")}>
                         Raw Image (Auto Crop)
                       </button>
                     </li>
                     <li>
-                      <button className="dropdown-item" type="button" onClick={() => setSelectedImageType("preprocessed")}>
+                      <button className="dropdown-item" onClick={() => setSelectedImageType("preprocessed")}>
                         Preprocessed (Already Cropped)
                       </button>
                     </li>
@@ -177,53 +170,55 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <h5>Upload or Capture Tea Image</h5>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleUpload}
-                  className="form-control mt-2"
-                />
-                <button className="btn btn-warning mt-2" onClick={handleCaptureImage}>
-                  📷 Capture Photo
+                <input type="file" accept="image/*" onChange={handleUpload} className="form-control mt-2" />
+                <button className="btn btn-warning mt-2 w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleCaptureImage}>
+                  <FiCamera /> Capture Photo
                 </button>
               </div>
             </div>
 
+            {/* Preview and actions card */}
             {previewUrl && (
               <div className="col-md-5">
-                <div className="card shadow-sm p-3 text-center">
-                  <img src={previewUrl} alt="Preview" className="img-fluid rounded mb-3" />
+                <div className="card shadow-lg p-3 bg-dark text-light text-center">
+                  <div className="preview-container mb-3" style={{ position: "relative" }}>
+                    <img src={previewUrl} alt="Preview" className="img-fluid rounded" style={{ maxHeight: "300px", objectFit: "contain" }} />
+                  </div>
+
                   <button
-                    className="btn btn-primary mb-2"
+                    className="btn btn-primary mb-2 w-100 d-flex align-items-center justify-content-center gap-2"
                     onClick={handlePredict}
                     disabled={isLoading}
                   >
-                    {isLoading ? "Predicting..." : "🔮 Predict Region"}
+                    {isLoading ? "Predicting..." : <><FiGrid /> Predict Region</>}
                   </button>
-                  <button className="btn btn-danger mt-2" onClick={handleClearImage}>
-                    🗑️ Clear Image
+                  <button className="btn btn-danger mt-2 w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleClearImage}>
+                    <FiRefreshCw /> Clear Image
                   </button>
 
                   {lastPrediction?.prediction && (
                     <div className="alert alert-info mt-3">
                       <strong>Last Prediction:</strong> {lastPrediction.prediction}{" "}
-                      {lastPrediction.confidence &&
-                        `(${(lastPrediction.confidence * 100).toFixed(1)}% confidence)`}
+                      {lastPrediction.confidence && `(${(lastPrediction.confidence * 100).toFixed(1)}% confidence)`}
                     </div>
                   )}
                 </div>
               </div>
             )}
           </div>
-        </div>
 
-        <div className="mt-4">
-          <button className="btn btn-primary text-white me-2" onClick={() => navigate("/multi")}>
-            🔮 Multiple Predictions
-          </button>
-          <button className="btn btn-dark" onClick={() => navigate("/")}>
-            🏠 Home
-          </button>
+          {/* Navigation buttons */}
+          <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+            <button className="btn btn-success w-auto d-flex align-items-center gap-2" onClick={() => navigate("/multi")}>
+              🔮 Multiple Predictions
+            </button>
+            <button className="btn btn-info w-auto d-flex align-items-center gap-2" onClick={() => navigate("/crop")}>
+              ✂️ Go to Crop Page
+            </button>
+            <button className="btn btn-dark w-auto" onClick={() => navigate("/")}>
+              🏠 Home
+            </button>
+          </div>
         </div>
       </div>
       <Footer />

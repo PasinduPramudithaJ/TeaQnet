@@ -10,6 +10,7 @@ import Results from "./assets/components/layout/Results";
 import Multipredict from "./assets/components/layout/Multipredict";
 import { JSX } from "react";
 import ModelComparison from "./assets/components/layout/ModelComparison";
+import CropLiquorImages from "./assets/components/layout/CropLiquorImages";
 
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
@@ -64,6 +65,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ModelComparison />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/crop" 
+          element={
+            <ProtectedRoute>
+              <CropLiquorImages />
             </ProtectedRoute>
           } 
         />

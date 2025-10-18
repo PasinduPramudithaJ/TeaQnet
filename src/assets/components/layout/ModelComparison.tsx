@@ -36,7 +36,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"
 const ModelComparison: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState<string>("http://10.120.199.186:5000");
+  const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW: image type
   const tableRef = useRef<HTMLDivElement>(null);
 

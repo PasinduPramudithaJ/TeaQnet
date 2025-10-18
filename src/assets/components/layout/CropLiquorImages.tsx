@@ -25,7 +25,6 @@ const CropLiquorImages: React.FC = () => {
     if (savedUrl) setApiUrl(savedUrl);
   }, []);
 
-  // Handle file uploads
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -44,7 +43,6 @@ const CropLiquorImages: React.FC = () => {
     e.target.value = "";
   };
 
-  // Crop all images
   const handleCropAll = async () => {
     if (images.length === 0) return alert("Please upload images first!");
     setIsCropping(true);
@@ -53,7 +51,6 @@ const CropLiquorImages: React.FC = () => {
         images.map(async (img) => {
           const formData = new FormData();
           formData.append("file", img.file);
-
           try {
             const res = await fetch(`${apiUrl}/crop_reflection`, { method: "POST", body: formData });
             if (!res.ok) throw new Error("Cropping failed");
@@ -70,7 +67,6 @@ const CropLiquorImages: React.FC = () => {
     }
   };
 
-  // Predict a single image
   const handlePredictSingle = async (img: CroppedImage) => {
     if (!img.croppedUrl) return alert("No cropped image available for prediction!");
     setIsPredicting(true);
@@ -96,7 +92,6 @@ const CropLiquorImages: React.FC = () => {
     }
   };
 
-  // Predict all cropped images
   const handlePredictAll = async () => {
     const croppedImgs = images.filter((img) => img.croppedUrl);
     if (croppedImgs.length === 0) return alert("No cropped images to predict!");
@@ -129,10 +124,8 @@ const CropLiquorImages: React.FC = () => {
     }
   };
 
-  // Clear all images
   const handleClear = () => setImages([]);
 
-  // Download single image
   const handleDownloadSingle = (croppedUrl: string, name: string) => {
     const link = document.createElement("a");
     link.href = croppedUrl;
@@ -140,7 +133,6 @@ const CropLiquorImages: React.FC = () => {
     link.click();
   };
 
-  // Download all cropped images as ZIP
   const handleDownloadAllZip = async () => {
     const zip = new JSZip();
     const croppedImgs = images.filter((img) => img.croppedUrl);
@@ -193,49 +185,72 @@ const CropLiquorImages: React.FC = () => {
         {images.length > 0 && (
           <div className="container mt-4">
             <h4 className="text-white mb-3">📸 Cropping & Prediction Results</h4>
-            <table className="table table-dark table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>File Name</th>
-                  <th>Original</th>
-                  <th>Cropped</th>
-                  <th>Prediction</th>
-                  <th>Confidence</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {images.map((img, index) => (
-                  <tr key={index}>
-                    <td>{img.file.name}</td>
-                    <td>
-                      <img src={img.previewUrl} alt="original" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "5px" }} />
-                    </td>
-                    <td>
-                      {img.croppedUrl ? (
-                        <img src={img.croppedUrl} alt="cropped" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "5px" }} />
-                      ) : (
-                        <span>{img.error ? "❌ Failed" : "⏳ Waiting"}</span>
-                      )}
-                    </td>
-                    <td>{img.prediction || "-"}</td>
-                    <td>{img.confidence ? img.confidence.toFixed(2) : "-"}</td>
-                    <td>
-                      {img.croppedUrl && (
-                        <>
-                          <button className="btn btn-sm btn-outline-success me-1" onClick={() => handleDownloadSingle(img.croppedUrl!, img.file.name)}>
-                            ⬇️ Download
-                          </button>
-                          <button className="btn btn-sm btn-outline-warning" onClick={() => handlePredictSingle(img)}>
-                            🔮 Predict
-                          </button>
-                        </>
-                      )}
-                    </td>
+
+            <div className="table-responsive">
+              <table className="table table-dark table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Original</th>
+                    <th>Cropped</th>
+                    <th>Prediction</th>
+                    <th>Confidence</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {images.map((img, index) => (
+                    <tr key={index}>
+                      <td style={{ maxWidth: "120px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {img.file.name}
+                      </td>
+                      <td>
+                        <img
+                          src={img.previewUrl}
+                          alt="original"
+                          className="img-fluid rounded"
+                          style={{ maxWidth: "80px", maxHeight: "80px" }}
+                        />
+                      </td>
+                      <td>
+                        {img.croppedUrl ? (
+                          <img
+                            src={img.croppedUrl}
+                            alt="cropped"
+                            className="img-fluid rounded"
+                            style={{ maxWidth: "80px", maxHeight: "80px" }}
+                          />
+                        ) : (
+                          <span>{img.error ? "❌ Failed" : "⏳ Waiting"}</span>
+                        )}
+                      </td>
+                      <td style={{ maxWidth: "100px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {img.prediction || "-"}
+                      </td>
+                      <td>{img.confidence ? img.confidence.toFixed(2) : "-"}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {img.croppedUrl && (
+                          <>
+                            <button
+                              className="btn btn-sm btn-outline-success me-1"
+                              onClick={() => handleDownloadSingle(img.croppedUrl!, img.file.name)}
+                            >
+                              ⬇️Download
+                            </button>
+                            <button
+                              className="btn btn-sm btn-outline-warning"
+                              onClick={() => handlePredictSingle(img)}
+                            >
+                              🔮Predict
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

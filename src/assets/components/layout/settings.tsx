@@ -4,7 +4,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 
 const Settings: React.FC = () => {
-  const [apiUrl, setApiUrl] = useState<string>("http://localhost:5000");
+  const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const navigate = useNavigate();
 
   useEffect(() => {

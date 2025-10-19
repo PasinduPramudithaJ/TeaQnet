@@ -265,7 +265,7 @@ const ModelComparison: React.FC = () => {
                       <td>{img.resultResNet4?.prediction || "—"}</td>
                       <td>{img.resultResNet4?.confidence ? (img.resultResNet4.confidence * 100).toFixed(2) + "%" : "—"}</td>
                       <td>
-                        {img.resultResNet18?.error || img.resultResNet4?.error ? "❌ Failed" : "✅ Done"}
+                        {img.resultResNet18?.error || img.resultResNet4?.error ? "❌ Failed" : img.resultResNet18 && img.resultResNet4 ? "✅ Done" : "⏳ Waiting"}
                       </td>
                     </tr>
                   ))}

@@ -186,10 +186,19 @@ const CropLiquorImages: React.FC = () => {
           <div className="container mt-4">
             <h4 className="text-white mb-3">📸 Cropping & Prediction Results</h4>
 
-            <div className="table-responsive">
-              <table className="table table-dark table-striped table-hover">
-                <thead>
+            <div
+              className="table-responsive"
+              style={{
+                maxHeight: images.length > 10 ? "1020px" : "none",
+                overflowY: images.length > 10 ? "auto" : "visible",
+                borderRadius: "10px",
+                boxShadow: images.length > 10 ? "0 0 10px rgba(0,0,0,0.3)" : "none",
+              }}
+            >
+              <table className="table table-dark table-striped table-hover mb-0">
+                <thead style={{ position: "sticky", top: 0, backgroundColor: "#212529", zIndex: 2 }}>
                   <tr>
+                    <th>#</th>
                     <th>File Name</th>
                     <th>Original</th>
                     <th>Cropped</th>
@@ -201,7 +210,15 @@ const CropLiquorImages: React.FC = () => {
                 <tbody>
                   {images.map((img, index) => (
                     <tr key={index}>
-                      <td style={{ maxWidth: "120px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <td>{index + 1}</td>
+                      <td
+                        style={{
+                          maxWidth: "120px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {img.file.name}
                       </td>
                       <td>
@@ -224,7 +241,14 @@ const CropLiquorImages: React.FC = () => {
                           <span>{img.error ? "❌ Failed" : "⏳ Waiting"}</span>
                         )}
                       </td>
-                      <td style={{ maxWidth: "100px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <td
+                        style={{
+                          maxWidth: "100px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {img.prediction || "-"}
                       </td>
                       <td>{img.confidence ? img.confidence.toFixed(2) : "-"}</td>
@@ -255,8 +279,12 @@ const CropLiquorImages: React.FC = () => {
         )}
 
         <div className="mt-4">
-          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>🔙 Dashboard</button>
-          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>🏠 Home</button>
+          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>
+            🔙 Dashboard
+          </button>
+          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>
+            🏠 Home
+          </button>
         </div>
       </div>
       <Footer />

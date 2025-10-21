@@ -36,8 +36,9 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"
 const ModelComparison: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [rowLoadingIndex, setRowLoadingIndex] = useState<number | null>(null);
   const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
-  const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW: image type
+  const [selectedImageType, setSelectedImageType] = useState<string>("raw");
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,6 +102,53 @@ const ModelComparison: React.FC = () => {
     }
   };
 
+  // ✅ Predict a single image (per-row)
+  const handlePredictSingle = async (index: number) => {
+    const img = images[index];
+    if (!img) return;
+
+    setRowLoadingIndex(index);
+    try {
+      const formData = new FormData();
+      formData.append("file", img.file);
+
+      const fetchModel = async (modelName: string): Promise<PredictionResponse> => {
+        try {
+          const res = await fetch(
+            `${apiUrl}/predict?model=${modelName}&type=${selectedImageType}`,
+            { method: "POST", body: formData }
+          );
+          return await res.json();
+        } catch {
+          return { error: "Prediction failed" };
+        }
+      };
+
+      const [resNet18, resNet4] = await Promise.all([
+        fetchModel("tea_4_region_model_restnet18"),
+        fetchModel("tea_4_region_model_restnet4"),
+      ]);
+
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...img, resultResNet18: resNet18, resultResNet4: resNet4 };
+        return updated;
+      });
+    } catch {
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[index] = {
+          ...img,
+          resultResNet18: { error: "Prediction failed" },
+          resultResNet4: { error: "Prediction failed" },
+        };
+        return updated;
+      });
+    } finally {
+      setRowLoadingIndex(null);
+    }
+  };
+
   const handleClear = () => setImages([]);
 
   // Charts
@@ -136,6 +184,28 @@ const ModelComparison: React.FC = () => {
     pdf.save("model_comparison.pdf");
   };
 
+   // Download as CSV
+  const handleDownloadCSV = () => {
+    if (images.length === 0) return;
+    const csvHeader = ["Image Name", "Restnet18 Prediction", "Restnet18 Confidence", "Restnet4 Prediction", "Restnet4 Confidence", "Status"];
+    const csvRows = images.map((img) => [
+      img.file.name,
+      img.resultResNet18?.prediction || "—",
+      img.resultResNet18?.confidence ? (img.resultResNet18.confidence * 100).toFixed(2) + "%" : "—",
+      img.resultResNet4?.prediction || "—",
+      img.resultResNet4?.confidence ? (img.resultResNet4.confidence * 100).toFixed(2) + "%" : "—",
+      img.resultResNet18?.error ? "Failed" : img.resultResNet18 ? "Done" : "Waiting",
+    ]);
+    const csvContent = [csvHeader.join(","), ...csvRows.map((r) => r.join(","))].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "tea_model_comparisonpredictions.csv";
+    link.click();
+  };
+
+
   return (
     <>
       <Header />
@@ -162,7 +232,7 @@ const ModelComparison: React.FC = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Cropped)"}
+              {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Already Cropped)"}
             </button>
             <ul className="dropdown-menu" aria-labelledby="imageTypeDropdown">
               <li>
@@ -187,7 +257,18 @@ const ModelComparison: React.FC = () => {
             </button>
             <button className="btn btn-danger me-2 mb-2" onClick={handleClear}>🗑️ Clear All</button>
             {images.length > 0 && (
-              <button className="btn btn-success mb-2" onClick={handleDownloadPDF}>📄 Download PDF</button>
+              <><button
+                className="btn btn-success me-2 mb-2 dropdown-toggle"
+                type="button"
+                id="downloadDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                ⬇️ Download Results
+              </button><ul className="dropdown-menu" aria-labelledby="downloadDropdown">
+                  <li><button className="dropdown-item" onClick={handleDownloadPDF}>📄 PDF</button></li>
+                  <li><button className="dropdown-item" onClick={handleDownloadCSV}>📊 CSV</button></li>
+                </ul></>
             )}
           </div>
         </div>
@@ -233,9 +314,16 @@ const ModelComparison: React.FC = () => {
           </div>
         )}
 
-        {/* Table */}
+        {/* ✅ Scrollable Table with Predict per Row */}
         {images.length > 0 && (
-          <div className="container mt-4 bg-white text-dark p-3 rounded shadow" ref={tableRef}>
+          <div
+            className="container mt-4 bg-white text-dark p-3 rounded shadow"
+            ref={tableRef}
+            style={{
+              maxHeight: images.length > 10 ? "1020px" : "auto",
+              overflowY: images.length > 10 ? "scroll" : "visible",
+            }}
+          >
             <div className="table-responsive">
               <table className="table table-striped table-bordered align-middle">
                 <thead className="table-dark">
@@ -248,6 +336,7 @@ const ModelComparison: React.FC = () => {
                     <th>ResNet4 Prediction</th>
                     <th>ResNet4 Confidence</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -255,17 +344,46 @@ const ModelComparison: React.FC = () => {
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td className="text-center">
-                        <img src={img.previewUrl} alt={`preview-${i}`} width="80" height="80"
-                          style={{ objectFit: "cover", borderRadius: "6px", border: "1px solid #ccc" }}
+                        <img
+                          src={img.previewUrl}
+                          alt={`preview-${i}`}
+                          width="80"
+                          height="80"
+                          style={{
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            border: "1px solid #ccc",
+                          }}
                         />
                       </td>
                       <td>{img.file.name}</td>
                       <td>{img.resultResNet18?.prediction || "—"}</td>
-                      <td>{img.resultResNet18?.confidence ? (img.resultResNet18.confidence * 100).toFixed(2) + "%" : "—"}</td>
-                      <td>{img.resultResNet4?.prediction || "—"}</td>
-                      <td>{img.resultResNet4?.confidence ? (img.resultResNet4.confidence * 100).toFixed(2) + "%" : "—"}</td>
                       <td>
-                        {img.resultResNet18?.error || img.resultResNet4?.error ? "❌ Failed" : img.resultResNet18 && img.resultResNet4 ? "✅ Done" : "⏳ Waiting"}
+                        {img.resultResNet18?.confidence
+                          ? (img.resultResNet18.confidence * 100).toFixed(2) + "%"
+                          : "—"}
+                      </td>
+                      <td>{img.resultResNet4?.prediction || "—"}</td>
+                      <td>
+                        {img.resultResNet4?.confidence
+                          ? (img.resultResNet4.confidence * 100).toFixed(2) + "%"
+                          : "—"}
+                      </td>
+                      <td>
+                        {img.resultResNet18?.error || img.resultResNet4?.error
+                          ? "❌ Failed"
+                          : img.resultResNet18 && img.resultResNet4
+                          ? "✅ Done"
+                          : "⏳ Waiting"}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          disabled={rowLoadingIndex === i}
+                          onClick={() => handlePredictSingle(i)}
+                        >
+                          {rowLoadingIndex === i ? "⏳ Predicting..." : "🔮 Predict"}
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -276,8 +394,18 @@ const ModelComparison: React.FC = () => {
         )}
 
         <div className="mt-4">
-          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>🔙 Dashboard</button>
-          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>🏠 Home</button>
+          <button
+            className="btn btn-secondary me-2"
+            onClick={() => (window.location.href = "/dashboard")}
+          >
+            🔙 Dashboard
+          </button>
+          <button
+            className="btn btn-dark"
+            onClick={() => (window.location.href = "/")}
+          >
+            🏠 Home
+          </button>
         </div>
       </div>
       <Footer />

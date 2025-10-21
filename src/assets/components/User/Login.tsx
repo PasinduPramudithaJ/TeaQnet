@@ -12,20 +12,31 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Redirect to dashboard if already signed in
     const isSignedIn = localStorage.getItem('isSignedIn') === 'true';
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdmin = storedUser.email==='pramudithapasindu48@gmail.com' && storedUser.password==='1234';
     if (isSignedIn) {
-      navigate('/dashboard');
+      if (isAdmin) {
+        navigate('/super');
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [navigate]);
-
+   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const storedUserAdmin = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdmin = storedUserAdmin.email==='pramudithapasindu48@gmail.com' && storedUserAdmin.password==='1234';
 
-    if (storedUser.email === email && storedUser.password === password) {
+    if (storedUserAdmin.email === email && storedUserAdmin.password === password) {
       // Mark as signed in
       localStorage.setItem('isSignedIn', 'true');
       alert('Login Successful!');
-      navigate('/dashboard');
+      if (isAdmin) {
+        navigate('/super');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       alert('Invalid Credentials');
     }

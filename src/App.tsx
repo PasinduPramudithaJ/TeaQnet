@@ -11,6 +11,7 @@ import Multipredict from "./assets/components/layout/Multipredict";
 import { JSX } from "react";
 import ModelComparison from "./assets/components/layout/ModelComparison";
 import CropLiquorImages from "./assets/components/layout/CropLiquorImages";
+import SuperDashboard from "./assets/components/layout/SuperDashboard";
 
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
@@ -73,6 +74,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CropLiquorImages />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/super" 
+          element={
+            <ProtectedRoute>
+              <SuperDashboard />
             </ProtectedRoute>
           } 
         />

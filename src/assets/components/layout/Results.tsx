@@ -159,12 +159,6 @@ const Results: React.FC = () => {
           >
             ⬅️ Back
           </button>
-          <button
-            className="btn btn-info"
-            onClick={() => navigate("/settings")}
-          >
-            ⚙️ API Settings
-          </button>
         </div>
       </div>
     </div>

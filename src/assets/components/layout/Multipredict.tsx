@@ -41,9 +41,10 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"
 const MultiPredict: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingIndex, setLoadingIndex] = useState<number | null>(null); // individual row loader
   const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const [selectedModel, setSelectedModel] = useState<string>("tea_4_region_model_restnet18");
-  const [selectedImageType, setSelectedImageType] = useState<string>("raw"); // NEW state for image type
+  const [selectedImageType, setSelectedImageType] = useState<string>("raw");
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,13 +87,9 @@ const MultiPredict: React.FC = () => {
         formData.append("file", img.file);
 
         try {
-          // Include both model and image type in the API call
           const response = await fetch(
             `${apiUrl}/predict?model=${selectedModel}&type=${selectedImageType}`,
-            {
-              method: "POST",
-              body: formData,
-            }
+            { method: "POST", body: formData }
           );
           const data: PredictionResponse = await response.json();
           return { ...img, result: data };
@@ -105,6 +102,38 @@ const MultiPredict: React.FC = () => {
       setImages(updatedResults);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Predict single image
+  const handlePredictSingle = async (index: number) => {
+    const img = images[index];
+    if (!img) return;
+
+    setLoadingIndex(index);
+    try {
+      const formData = new FormData();
+      formData.append("file", img.file);
+
+      const response = await fetch(
+        `${apiUrl}/predict?model=${selectedModel}&type=${selectedImageType}`,
+        { method: "POST", body: formData }
+      );
+
+      const data: PredictionResponse = await response.json();
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...img, result: data };
+        return updated;
+      });
+    } catch (error) {
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...img, result: { error: "Prediction failed" } };
+        return updated;
+      });
+    } finally {
+      setLoadingIndex(null);
     }
   };
 
@@ -142,10 +171,7 @@ const MultiPredict: React.FC = () => {
       img.result?.confidence ? (img.result.confidence * 100).toFixed(2) + "%" : "—",
       img.result?.error ? "Failed" : img.result ? "Done" : "Waiting",
     ]);
-    const csvContent = [
-      csvHeader.join(","),
-      ...csvRows.map((r) => r.join(",")),
-    ].join("\n");
+    const csvContent = [csvHeader.join(","), ...csvRows.map((r) => r.join(","))].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -154,7 +180,7 @@ const MultiPredict: React.FC = () => {
     link.click();
   };
 
-  // Charts
+  // Chart data
   const validResults = images.filter((img) => img.result?.prediction && !img.result?.error);
   const predictionCounts: Record<string, number> = {};
   const confidenceSums: Record<string, number> = {};
@@ -192,7 +218,10 @@ const MultiPredict: React.FC = () => {
         <p><strong>Backend:</strong> {apiUrl}</p>
 
         {/* Model and Image Type selection */}
-        <div className="card p-4 bg-light text-dark shadow-sm mb-4" style={{ width: "80%", maxWidth: "900px" }}>
+        <div
+          className="card p-4 bg-light text-dark shadow-sm mb-4"
+          style={{ width: "80%", maxWidth: "900px" }}
+        >
           <h5>Select Model</h5>
           <div className="dropdown mb-3">
             <button
@@ -208,7 +237,6 @@ const MultiPredict: React.FC = () => {
               <li>
                 <button
                   className="dropdown-item"
-                  type="button"
                   onClick={() => setSelectedModel("tea_4_region_model_restnet18")}
                 >
                   ResNet 18
@@ -217,7 +245,6 @@ const MultiPredict: React.FC = () => {
               <li>
                 <button
                   className="dropdown-item"
-                  type="button"
                   onClick={() => setSelectedModel("tea_4_region_model_restnet4")}
                 >
                   ResNet 4
@@ -226,7 +253,6 @@ const MultiPredict: React.FC = () => {
             </ul>
           </div>
 
-          {/* NEW: Image Type Dropdown */}
           <h5>Select Image Type</h5>
           <div className="dropdown mb-3">
             <button
@@ -236,22 +262,19 @@ const MultiPredict: React.FC = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {selectedImageType === "raw" ? "Raw Image (Auto Crop)" : "Preprocessed (Cropped)"}
+              {selectedImageType === "raw"
+                ? "Raw Image (Auto Crop)"
+                : "Preprocessed (Already Cropped)"}
             </button>
             <ul className="dropdown-menu" aria-labelledby="imageTypeDropdown">
               <li>
-                <button
-                  className="dropdown-item"
-                  type="button"
-                  onClick={() => setSelectedImageType("raw")}
-                >
+                <button className="dropdown-item" onClick={() => setSelectedImageType("raw")}>
                   Raw Image (Auto Crop)
                 </button>
               </li>
               <li>
                 <button
                   className="dropdown-item"
-                  type="button"
                   onClick={() => setSelectedImageType("preprocessed")}
                 >
                   Preprocessed (Already Cropped)
@@ -265,7 +288,7 @@ const MultiPredict: React.FC = () => {
 
           <div className="mt-3 d-flex justify-content-center flex-wrap">
             <button className="btn btn-primary me-2 mb-2" onClick={handlePredictAll} disabled={isLoading}>
-              {isLoading ? "Predicting..." : "🔮 Predict All"}
+              {isLoading ? "Predicting All..." : "🔮 Predict All"}
             </button>
             <button className="btn btn-danger me-2 mb-2" onClick={handleClear}>
               🗑️ Clear All
@@ -334,7 +357,14 @@ const MultiPredict: React.FC = () => {
 
         {/* Table */}
         {images.length > 0 && (
-          <div className="container mt-4 bg-white text-dark p-3 rounded shadow" ref={tableRef}>
+          <div
+            className="container mt-4 bg-white text-dark p-3 rounded shadow"
+            ref={tableRef}
+            style={{
+              maxHeight: images.length > 10 ? "1020px" : "auto",
+              overflowY: images.length > 10 ? "scroll" : "visible",
+            }}
+          >
             <div className="table-responsive">
               <table className="table table-striped table-bordered align-middle">
                 <thead className="table-dark">
@@ -345,6 +375,7 @@ const MultiPredict: React.FC = () => {
                     <th>Prediction</th>
                     <th>Confidence</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -357,14 +388,35 @@ const MultiPredict: React.FC = () => {
                           alt={`preview-${i}`}
                           width="80"
                           height="80"
-                          style={{ objectFit: "cover", borderRadius: "6px", border: "1px solid #ccc" }}
+                          style={{
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            border: "1px solid #ccc",
+                          }}
                         />
                       </td>
                       <td>{img.file.name}</td>
                       <td>{img.result?.prediction || "—"}</td>
-                      <td>{img.result?.confidence ? (img.result.confidence * 100).toFixed(2) + "%" : "—"}</td>
                       <td>
-                        {img.result?.error ? "❌ Failed" : img.result ? "✅ Done" : "⏳ Waiting"}
+                        {img.result?.confidence
+                          ? (img.result.confidence * 100).toFixed(2) + "%"
+                          : "—"}
+                      </td>
+                      <td>
+                        {img.result?.error
+                          ? "❌ Failed"
+                          : img.result
+                          ? "✅ Done"
+                          : "⏳ Waiting"}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          disabled={loadingIndex === i}
+                          onClick={() => handlePredictSingle(i)}
+                        >
+                          {loadingIndex === i ? "🔮 Predicting..." : "🔮 Predict"}
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -375,9 +427,15 @@ const MultiPredict: React.FC = () => {
         )}
 
         <div className="mt-4">
-          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>🔙 Dashboard</button>
-          <button className="btn btn-success me-2" onClick={() => (window.location.href = "/comparison")}> Model Comparison</button>
-          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>🏠 Home</button>
+          <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>
+            🔙 Dashboard
+          </button>
+          <button className="btn btn-success me-2" onClick={() => (window.location.href = "/comparison")}>
+            🧠 Model Comparison
+          </button>
+          <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>
+            🏠 Home
+          </button>
         </div>
       </div>
       <Footer />

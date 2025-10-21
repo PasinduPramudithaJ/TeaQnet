@@ -137,7 +137,6 @@ const Dashboard: React.FC = () => {
         </button>
 
         <h2 className="text-center mb-4 text-shadow">🍵 Tea Region Dashboard</h2>
-        <p className="text-light text-shadow"><strong>Backend:</strong> {apiUrl}</p>
 
         <div className="container">
           <div className="row justify-content-center gy-4">

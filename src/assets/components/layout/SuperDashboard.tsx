@@ -29,10 +29,10 @@ interface FeatureBlock {
 
 const featureBlocks: FeatureBlock[] = [
   { label: "Multi Predict", icon: <FiLayers />, route: "/multi", color: "primary", description: "Upload multiple images for batch prediction." },
-  { label: "Crop Tool", icon: <FiScissors />, route: "/crop", color: "info", description: "Crop and preprocess your images before prediction." },
+  { label: "Crop & Predict Tool", icon: <FiScissors />, route: "/crop", color: "info", description: "Crop and preprocess your images before prediction." },
   { label: "Model Comparison", icon: <FiServer />, route: "/comparison", color: "secondary", description: "Compare different models and their performance." },
   { label: "API Settings", icon: <FiSettings />, route: "/settings", color: "warning", description: "Change API and model settings (Admin Only)" },
-   { label: "Polyphenol Prediction", icon: <FiGrid />, route: "/polyphenol", color: "success", description: "Predict polyphenol content from tea leaf images." },
+   { label: "Polyphenol Based Predict", icon: <FiGrid />, route: "/polyphenol", color: "success", description: "Predict polyphenol content from tea leaf images." },
   { label: "Home", icon: <FiHome />, route: "/", color: "dark", description: "Return to the main homepage. New features coming soon!" },
 ];
 

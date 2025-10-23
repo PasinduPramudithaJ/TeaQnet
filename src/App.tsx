@@ -12,6 +12,7 @@ import { JSX } from "react";
 import ModelComparison from "./assets/components/layout/ModelComparison";
 import CropLiquorImages from "./assets/components/layout/CropLiquorImages";
 import SuperDashboard from "./assets/components/layout/SuperDashboard";
+import PolyphenolPredict from "./assets/components/layout/PolyphenolPredict";
 
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
@@ -82,6 +83,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SuperDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/polyphenol" 
+          element={
+            <ProtectedRoute>
+              <PolyphenolPredict />
             </ProtectedRoute>
           } 
         />

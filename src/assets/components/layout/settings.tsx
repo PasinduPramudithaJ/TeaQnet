@@ -17,7 +17,7 @@ const Settings: React.FC = () => {
   const handleSave = () => {
     localStorage.setItem("backend_url", apiUrl);
     alert("✅ API URL saved!");
-    navigate("/dashboard");
+    navigate("/super");
   };
 
   return (

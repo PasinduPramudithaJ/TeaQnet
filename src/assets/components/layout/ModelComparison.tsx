@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
@@ -40,6 +41,8 @@ const ModelComparison: React.FC = () => {
   const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const [selectedImageType, setSelectedImageType] = useState<string>("raw");
   const tableRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const savedUrl = localStorage.getItem("backend_url");
@@ -220,7 +223,6 @@ const ModelComparison: React.FC = () => {
         }}
       >
         <h2 className="mb-4">Model Comparison</h2>
-        <p><strong>Backend:</strong> {apiUrl}</p>
 
         <div className="card p-4 bg-light text-dark shadow-sm mb-4" style={{ width: "80%", maxWidth: "900px" }}>
           <h5>Select Image Type</h5>
@@ -394,11 +396,17 @@ const ModelComparison: React.FC = () => {
         )}
 
         <div className="mt-4">
+      <button 
+           className="btn btn-primary me-2"
+           onClick={() => navigate(-1)}
+            >
+          ← Back
+       </button>
           <button
             className="btn btn-secondary me-2"
             onClick={() => (window.location.href = "/dashboard")}
           >
-            🔙 Dashboard
+            Dashboard
           </button>
           <button
             className="btn btn-dark"

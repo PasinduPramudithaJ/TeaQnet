@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
 import jsPDF from "jspdf";
@@ -28,6 +29,7 @@ const PolyphenolPredict: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
   const tableRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // -------------------------- CSV Upload --------------------------
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,8 +185,6 @@ const PolyphenolPredict: React.FC = () => {
         }}
       >
         <h2 className="mb-3">☕ Polyphenol-based Region Classification</h2>
-        <p><strong>Backend:</strong> {apiUrl}</p>
-
         <div className="card p-4 bg-light text-dark shadow-sm mb-4" style={{ width: "80%", maxWidth: "900px" }}>
           <h5>Upload Polyphenol Data (CSV)</h5>
           <input
@@ -290,8 +290,14 @@ const PolyphenolPredict: React.FC = () => {
         )}
 
         <div className="mt-4">
+          <button 
+           className="btn btn-primary me-2"
+           onClick={() => navigate(-1)}
+            >
+          ← Back
+       </button>
           <button className="btn btn-dark me-2" onClick={() => (window.location.href = "/dashboard")}>
-            🔙 Dashboard
+            Dashboard
           </button>
           <button className="btn btn-secondary" onClick={() => (window.location.href = "/")}>
             🏠 Home

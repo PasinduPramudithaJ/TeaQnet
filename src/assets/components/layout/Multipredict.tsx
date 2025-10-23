@@ -4,6 +4,7 @@ import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useNavigate } from "react-router-dom";
 import {
   PieChart,
   Pie,
@@ -46,6 +47,7 @@ const MultiPredict: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>("tea_4_region_model_restnet18");
   const [selectedImageType, setSelectedImageType] = useState<string>("raw");
   const tableRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedUrl = localStorage.getItem("backend_url");
@@ -215,7 +217,6 @@ const MultiPredict: React.FC = () => {
         }}
       >
         <h2 className="mb-4">Multiple Tea Prediction</h2>
-        <p><strong>Backend:</strong> {apiUrl}</p>
 
         {/* Model and Image Type selection */}
         <div
@@ -427,8 +428,14 @@ const MultiPredict: React.FC = () => {
         )}
 
         <div className="mt-4">
+         <button 
+           className="btn btn-primary me-2"
+           onClick={() => navigate(-1)}
+            >
+          ← Back
+       </button>
           <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>
-            🔙 Dashboard
+            Dashboard
           </button>
           <button className="btn btn-success me-2" onClick={() => (window.location.href = "/comparison")}>
             🧠 Model Comparison

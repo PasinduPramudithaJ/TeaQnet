@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 import Header from "./Header";
 import Footer from "./Footer";
 import image1 from "../../images/background2.jpg";
+import { useNavigate } from "react-router-dom";
 
 interface CroppedImage {
   file: File;
@@ -19,6 +20,7 @@ const CropLiquorImages: React.FC = () => {
   const [isCropping, setIsCropping] = useState(false);
   const [isPredicting, setIsPredicting] = useState(false);
   const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedUrl = localStorage.getItem("backend_url");
@@ -162,7 +164,6 @@ const CropLiquorImages: React.FC = () => {
         }}
       >
         <h2 className="mb-4">🍵 Tea Liquor Image Cropper & Predictor</h2>
-        <p><strong>Backend:</strong> {apiUrl}</p>
 
         <div className="card p-4 bg-light text-dark shadow-sm mb-4" style={{ width: "90%", maxWidth: "1000px" }}>
           <h5>Upload Tea Liquor Images (Sequence)</h5>
@@ -279,8 +280,14 @@ const CropLiquorImages: React.FC = () => {
         )}
 
         <div className="mt-4">
+          <button 
+           className="btn btn-primary me-2"
+           onClick={() => navigate(-1)}
+            >
+          ← Back
+       </button>
           <button className="btn btn-secondary me-2" onClick={() => (window.location.href = "/dashboard")}>
-            🔙 Dashboard
+            Dashboard
           </button>
           <button className="btn btn-dark" onClick={() => (window.location.href = "/")}>
             🏠 Home

@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
           style={{ top: 12, right: 12 }}
           title="Logout"
         >
-          <FiLogOut size={18} />
+          <FiLogOut size={18} /> Logout
         </button>
 
         <h2 className="text-center mb-4 text-shadow">🍵 Tea Region Dashboard</h2>
@@ -208,6 +208,7 @@ const Dashboard: React.FC = () => {
 
           {/* Navigation buttons */}
           <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+            <button className="btn btn-primary me-2" onClick={() => navigate(-1)}>← Back</button>
             <button className="btn btn-success w-auto d-flex align-items-center gap-2" onClick={() => navigate("/multi")}>
               🔮 Multiple Predictions
             </button>

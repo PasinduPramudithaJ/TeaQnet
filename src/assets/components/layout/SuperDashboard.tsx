@@ -28,6 +28,7 @@ interface FeatureBlock {
 }
 
 const featureBlocks: FeatureBlock[] = [
+  { label: "Single Predict", icon: <FiActivity />, route: "/dashboard", color: "success", description: "Perform prediction for a single tea liquor sample." },
   { label: "Multi Predict", icon: <FiLayers />, route: "/multi", color: "primary", description: "Upload multiple images for batch prediction." },
   { label: "Crop & Predict Tool", icon: <FiScissors />, route: "/crop", color: "info", description: "Crop and preprocess your images before prediction." },
   { label: "Model Comparison", icon: <FiServer />, route: "/comparison", color: "secondary", description: "Compare different models and their performance." },

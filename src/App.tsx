@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from "./assets/components/layout/Home";
@@ -14,10 +14,28 @@ import CropLiquorImages from "./assets/components/layout/CropLiquorImages";
 import SuperDashboard from "./assets/components/layout/SuperDashboard";
 import PolyphenolPredict from "./assets/components/layout/PolyphenolPredict";
 
-// ProtectedRoute component
+// Enhanced ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isSignedIn = localStorage.getItem("isSignedIn") === "true";
-  return isSignedIn ? children : <Navigate to="/login" replace />;
+  const storedUser = localStorage.getItem("user");
+  const adminEmail = "pramudithapasindu48@gmail.com";
+  const location = useLocation();
+
+  // If user not signed in, redirect to login
+  if (!isSignedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Check user data
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin = user && user.email === adminEmail;
+
+  // Restrict access to /super
+  if (location.pathname === "/super" && !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  // Otherwise allow
+  return children;
 };
 
 function App() {
@@ -30,72 +48,72 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Protected Routes */}
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/settings" 
+        <Route
+          path="/settings"
           element={
             <ProtectedRoute>
               <Settings />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/results" 
+        <Route
+          path="/results"
           element={
             <ProtectedRoute>
               <Results />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/multi" 
+        <Route
+          path="/multi"
           element={
             <ProtectedRoute>
               <Multipredict />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/comparison" 
+        <Route
+          path="/comparison"
           element={
             <ProtectedRoute>
               <ModelComparison />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/crop" 
+        <Route
+          path="/crop"
           element={
             <ProtectedRoute>
               <CropLiquorImages />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/super" 
-          element={
-            <ProtectedRoute>
-              <SuperDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/polyphenol" 
+        <Route
+          path="/polyphenol"
           element={
             <ProtectedRoute>
               <PolyphenolPredict />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/super"
+          element={
+            <ProtectedRoute>
+              <SuperDashboard />
+            </ProtectedRoute>
+          }
         />
 
-        {/* Catch-all route to redirect unknown paths to home */}
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

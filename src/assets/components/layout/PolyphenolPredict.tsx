@@ -36,7 +36,7 @@ const PolyphenolPredict: React.FC = () => {
   // ✅ Multi-backend URLs (local + cloud)
   const [apiUrls] = useState<string[]>([
     `http://${window.location.hostname}:5000`,
-    `https://tea-region-backend.onrender.com` // <-- replace with your actual deployed API URL
+    `https://polyphenol-based-region-classification.onrender.com` // <-- replace with your actual deployed API URL
   ]);
   const [activeApiUrl, setActiveApiUrl] = useState(apiUrls[0]);
 

@@ -9,11 +9,19 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  const adminEmail = 'pramudithapasindu48@gmail.com';
+
   useEffect(() => {
-    // If user is already signed in, redirect to dashboard
+    // If user is already signed in, redirect accordingly
     const isSignedIn = localStorage.getItem('isSignedIn') === 'true';
-    if (isSignedIn) {
-      navigate('/dashboard');
+    const storedUser = localStorage.getItem('user');
+    if (isSignedIn && storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.email === adminEmail) {
+        navigate('/super');
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [navigate]);
 
@@ -26,6 +34,8 @@ const Register: React.FC = () => {
     }
 
     const storedUser = localStorage.getItem('user');
+
+    // Prevent overwriting admin or duplicate users
     if (storedUser) {
       const existingUser = JSON.parse(storedUser);
       if (existingUser.email === email) {
@@ -34,10 +44,21 @@ const Register: React.FC = () => {
       }
     }
 
-    // Store user in localStorage
-    localStorage.setItem('user', JSON.stringify({ email, password }));
-    alert('Registered Successfully!');
-    navigate('/login'); // redirect to login
+    // Save user credentials
+    const newUser = { email, password };
+    localStorage.setItem('user', JSON.stringify(newUser));
+
+    // If admin registers, auto sign in and redirect to /super
+    if (email === adminEmail) {
+      localStorage.setItem('isSignedIn', 'true');
+      alert('Admin registered successfully!');
+      navigate('/super');
+      return;
+    }
+
+    // Normal user flow
+    alert('Registered successfully! Please log in.');
+    navigate('/login');
   };
 
   return (

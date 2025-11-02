@@ -37,14 +37,14 @@ interface ImagePrediction {
   result?: PredictionResponse;
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D885F9", "#FF6B6B", "#6A4C93", "#FFA500", "#8BC34A"];
 
 const MultiPredict: React.FC = () => {
   const [images, setImages] = useState<ImagePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null); // individual row loader
   const [apiUrl, setApiUrl] = useState<string>(`http://${window.location.hostname}:5000`);
-  const [selectedModel, setSelectedModel] = useState<string>("tea_4_region_model_restnet18");
+  const [selectedModel, setSelectedModel] = useState<string>("resnet18_tea_region");
   const [selectedImageType, setSelectedImageType] = useState<string>("raw");
   const tableRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -203,6 +203,23 @@ const MultiPredict: React.FC = () => {
     avgConfidence: (confidenceSums[key] / predictionCounts[key]) * 100,
   }));
 
+// Mapping full names to abbreviations
+const regionAbbr: { [key: string]: string } = {
+  "Dimbula Region": "DI",
+  "Kandy Region": "KA",
+  "Nuwara Eliya Region": "NU",
+  "Uda Pussellawa Region": "UP",
+  "Uva Region": "UV",
+  "Sabaragamuwa Region": "SB",
+  "Ruhuna Region": "RU"
+};
+
+// Transform barData to use abbreviations
+const barDataWithAbbr = barData.map(item => ({
+  ...item,
+  name: regionAbbr[item.name] || item.name // fallback to original if not found
+}));
+
   return (
     <>
       <Header />
@@ -232,13 +249,13 @@ const MultiPredict: React.FC = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {selectedModel === "tea_4_region_model_restnet18" ? "ResNet 18" : "ResNet 4"}
+              {selectedModel === "resnet18_tea_region" ? "ResNet 18" : selectedModel === "resnet4_tea_region" ? "ResNet 4" : selectedModel === "mobilenetv2_tea_region" ? "MobileNet V2" : selectedModel === "efficientnetb0_tea_region" ? "Efficientnet B0" : selectedModel === "shufflenetv2_tea_region" ? "Shufflenet V2" : selectedModel === "squeezenet_tea_region" ? "SqueezeNet" : "Select Model"}
             </button>
             <ul className="dropdown-menu" aria-labelledby="modelDropdown">
               <li>
                 <button
                   className="dropdown-item"
-                  onClick={() => setSelectedModel("tea_4_region_model_restnet18")}
+                  onClick={() => setSelectedModel("resnet18_tea_region")}
                 >
                   ResNet 18
                 </button>
@@ -246,9 +263,41 @@ const MultiPredict: React.FC = () => {
               <li>
                 <button
                   className="dropdown-item"
-                  onClick={() => setSelectedModel("tea_4_region_model_restnet4")}
+                  onClick={() => setSelectedModel("resnet4_tea_region")}
                 >
                   ResNet 4
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setSelectedModel("mobilenetv2_tea_region")}
+                >
+                  MobileNet V2
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setSelectedModel("efficientnetb0_tea_region")}
+                >
+                  Efficientnet B0
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setSelectedModel("shufflenetv2_tea_region")}
+                >
+                  Shufflenet V2
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setSelectedModel("squeezenet_tea_region")}
+                >
+                  SqueezeNet
                 </button>
               </li>
             </ul>
@@ -323,8 +372,8 @@ const MultiPredict: React.FC = () => {
             <div className="row">
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
-                  <h6>🥧 Prediction Distribution</h6>
-                  <ResponsiveContainer width="100%" height={300}>
+                  <h6 style={{ color: 'black' }}>🥧 Prediction Distribution</h6>
+                  <ResponsiveContainer width="100%" height={330}>
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={100} label>
                         {pieData.map((_entry, index) => (
@@ -340,15 +389,15 @@ const MultiPredict: React.FC = () => {
 
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
-                  <h6>📈 Avg Confidence per Region</h6>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={barData}>
-                      <XAxis dataKey="name" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="avgConfidence" fill="#82ca9d" barSize={60} />
-                    </BarChart>
+                 <h6 style={{ color: 'black' }}>📈 Avg Confidence per Region</h6>
+                   <ResponsiveContainer width="100%" height={330}>
+                   <BarChart data={barDataWithAbbr}>
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="avgConfidence" fill="#82ca9d" barSize={60} />
+                  </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>

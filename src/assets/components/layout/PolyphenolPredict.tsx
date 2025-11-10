@@ -162,7 +162,7 @@ const PolyphenolPredict: React.FC = () => {
         row.Concentration,
         res.prediction || "—",
         res.confidence ? (res.confidence * 100).toFixed(2) + "%" : "—",
-        res.prediction ? (isCorrect ? "✅ Correct" : "❌ Failed") : "—",
+        res.prediction ? (isCorrect ? "Correct" : "Failed") : "—",
       ];
     });
     const csv = [header.join(","), ...rows.map((r) => r.join(","))].join("\n");

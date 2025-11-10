@@ -292,7 +292,7 @@ const ModelComparison: React.FC = () => {
             <div className="row">
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
-                  <h6>🥧 Agreement vs Disagreement</h6>
+                  <h6 style={{ color: 'black' }}>🥧 Agreement vs Disagreement</h6>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={100} label>
@@ -309,7 +309,7 @@ const ModelComparison: React.FC = () => {
 
               <div className="col-md-6 mb-4">
                 <div className="bg-white rounded p-3 shadow-sm">
-                  <h6>📈 Confidence Comparison per Image</h6>
+                  <h6 style={{ color: 'black' }}>📈 Confidence Comparison per Image</h6>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={barData}>
                       <XAxis dataKey="name" />

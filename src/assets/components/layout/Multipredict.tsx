@@ -249,7 +249,7 @@ const barDataWithAbbr = barData.map(item => ({
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {selectedModel === "resnet18_tea_region" ? "ResNet 18" : selectedModel === "resnet4_tea_region" ? "ResNet 4" : selectedModel === "mobilenetv2_tea_region" ? "MobileNet V2" : selectedModel === "efficientnetb0_tea_region" ? "Efficientnet B0" : selectedModel === "shufflenetv2_tea_region" ? "Shufflenet V2" : selectedModel === "squeezenet_tea_region" ? "SqueezeNet" : "Select Model"}
+              {selectedModel === "resnet18_tea_region" ? "ResNet 18" : selectedModel === "customcnn_tea_region" ? "CNN-8" : selectedModel === "mobilenetv2_tea_region" ? "MobileNet V2" : selectedModel === "efficientnetb0_tea_region" ? "Efficientnet B0" : selectedModel === "shufflenetv2_tea_region" ? "Shufflenet V2" : selectedModel === "squeezenet_tea_region" ? "SqueezeNet" : "Select Model"}
             </button>
             <ul className="dropdown-menu" aria-labelledby="modelDropdown">
               <li>
@@ -263,9 +263,9 @@ const barDataWithAbbr = barData.map(item => ({
               <li>
                 <button
                   className="dropdown-item"
-                  onClick={() => setSelectedModel("resnet4_tea_region")}
+                  onClick={() => setSelectedModel("customcnn_tea_region")}
                 >
-                  ResNet 4
+                  CNN-8
                 </button>
               </li>
               <li>
